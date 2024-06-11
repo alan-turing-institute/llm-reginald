@@ -1,0 +1,17 @@
+[tool.poetry]
+name = "llm-reginald"
+version = "0.1.0"
+description = ""
+authors = ["Oliver Strickson <ostrickson@turing.ac.uk>"]
+readme = "README.md"
+
+[tool.poetry.dependencies]
+python = ">=3.11,<3.12"
+llm = "^0.14"
+
+[build-system]
+requires = ["poetry-core"]
+build-backend = "poetry.core.masonry.api"
+
+[tool.poetry.plugins."llm"]
+reginald = "llm_reginald.llm_reginald"
