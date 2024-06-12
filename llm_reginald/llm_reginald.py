@@ -34,14 +34,18 @@ class Reginald(llm.Model):
         except (TypeError, AttributeError, KeyError, IndexError) as e:
             user_id = str(uuid.uuid4().int)
 
-        with httpx.Client() as client:
-            reginald_reply = client.post(
-                self._direct_message_endpoint(),
-                json={"message": message, "user_id": user_id},
-                timeout=None
-            )
+        try:
+            with httpx.Client() as client:
+                reginald_reply = client.post(
+                    self._direct_message_endpoint(),
+                    json={"message": message, "user_id": user_id},
+                    timeout=None
+                )
+            reginald_reply.raise_for_status()
+        except httpx.HTTPError as e:
+            # re-raise as an llm.ModelError for llm to report
+            raise llm.ModelError(f"Could not connect to Reginald at {self._direct_message_endpoint()}.\n\nThe error was:\n    {e}.\n\nIs the model server running?")
 
-        reginald_reply.raise_for_status()
         yield reginald_reply.json()['message']
 
         response.response_json = {'user_id': user_id}
